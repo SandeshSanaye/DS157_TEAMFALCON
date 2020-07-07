@@ -1,0 +1,2 @@
+[34m2020-05-07 17:45:44.590 UTC [channelCmd] InitCmdFactory -> INFO 001[0m Endorser and orderer connections initialized
+[34m2020-05-07 17:45:44.715 UTC [channelCmd] update -> INFO 002[0m Successfully submitted channel update
