@@ -11,6 +11,8 @@ export ORDERER_CA=${PWD}/../organizations/ordererOrganizations/landrecord.com/or
 export PEER0_map_CA=${PWD}/../organizations/peerOrganizations/map.landrecord.com/peers/peer0.map.landrecord.com/tls/ca.crt
 export PEER0_registrar_CA=${PWD}/../organizations/peerOrganizations/registrar.landrecord.com/peers/peer0.registrar.landrecord.com/tls/ca.crt
 export PEER0_revenue_CA=${PWD}/../organizations/peerOrganizations/revenue.landrecord.com/peers/peer0.revenue.landrecord.com/tls/ca.crt
+export PEER0_welfare_CA=${PWD}/../organizations/peerOrganizations/welfare.com/peers/peer0.welfare.com/tls/ca.crt
+
 
 # Set OrdererOrg.Admin globals
 setOrdererGlobals() {
@@ -44,6 +46,13 @@ setGlobals() {
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_revenue_CA
     export CORE_PEER_MSPCONFIGPATH=${PWD}/../organizations/peerOrganizations/revenue.landrecord.com/users/Admin@revenue.landrecord.com/msp
     export CORE_PEER_ADDRESS=localhost:10051
+
+  elif [ $USING_ORG -eq 4 ]; then
+    export CORE_PEER_LOCALMSPID="welfareMSP"
+    export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_welfare_CA
+    export CORE_PEER_MSPCONFIGPATH=${PWD}/../organizations/peerOrganizations/welfare.com/users/Admin@welfare.com/msp
+    export CORE_PEER_ADDRESS=localhost:11051
+  
   else
     echo "================== ERROR !!! ORG Unknown =================="
   fi

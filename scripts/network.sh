@@ -82,17 +82,18 @@ function networkUp() {
     echo "ERROR !!!! Unable to start network"
     exit 1
   fi
-  fi
+  else
   IMAGE_TAG=$IMAGETAG docker-compose -f "$COMPOSE_FILE_BASE" up -d 2>&1
   docker ps -a
   if [ $? -ne 0 ]; then
     echo "ERROR !!!! Unable to start network"
     exit 1
   fi
+  fi
 }
 
 # default image tag
-IMAGETAG="latest"
+IMAGETAG=2.1.1
 
 # Check for flags
 while [[ $# -ge 1 ]] ; do

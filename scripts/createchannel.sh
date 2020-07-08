@@ -38,7 +38,7 @@ createChannelTx() {
 
 createAncorPeerTx() {
 
-	for orgmsp in mapMSP registrarMSP revenueMSP; do
+	for orgmsp in mapMSP registrarMSP revenueMSP welfareMSP; do
 
 	echo "#######    Generating anchor peer update for ${orgmsp}  ##########"
 	set -x
@@ -147,6 +147,8 @@ echo "Join Org2 peers to the channel..."
 joinChannel 2
 echo "Join Org3 peers to the channel..."
 joinChannel 3
+echo "Join Org4 peers to the channel..."
+joinChannel 4
 
 ## Set the anchor peers for each org in the channel
 echo "Updating anchor peers for org1..."
@@ -155,7 +157,8 @@ echo "Updating anchor peers for org2..."
 updateAnchorPeers 2
 echo "Updating anchor peers for org3..."
 updateAnchorPeers 3
-
+echo "Updating anchor peers for org4..."
+updateAnchorPeers 4
 
 echo
 echo "========= Channel successfully joined =========== "
