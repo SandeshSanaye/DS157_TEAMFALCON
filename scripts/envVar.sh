@@ -55,6 +55,7 @@ setGlobals() {
   
   else
     echo "================== ERROR !!! ORG Unknown =================="
+    exit 1
   fi
 
   if [ "$VERBOSE" == "true" ]; then

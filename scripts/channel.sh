@@ -4,7 +4,7 @@ if [ ! -d "../organizations/peerOrganizations" ]; then
   ./network.sh
 fi
 
-#Default Settings
+#Default Settingsdoc
 CHANNEL_NAME='landrecords'
 #Delat between commands
 CLI_DELAY=3

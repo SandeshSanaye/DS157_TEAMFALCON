@@ -93,7 +93,7 @@ function networkUp() {
 }
 
 # default image tag
-IMAGETAG=2.1.1
+IMAGETAG="latest"
 
 # Check for flags
 while [[ $# -ge 1 ]] ; do
