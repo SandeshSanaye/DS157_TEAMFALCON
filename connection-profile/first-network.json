@@ -1,0 +1,73 @@
+{
+	"name": "first-network",
+	"version": "1.0.0",
+	"client": {
+		"tlsEnable": true,
+		"adminUser": "mapadmin",
+		"adminPassword": "mapadminpw",
+		"enableAuthentication": false,
+		"organization": "mapMSP",
+		"connection": {
+			"timeout": {
+				"peer": {
+					"endorser": "300"
+				},
+				"orderer": "300"
+			}
+		}
+	},
+	"channels": {
+		"landrecords": {
+			"peers": {
+				"peer0.map.landrecord.com": {}
+			},
+			"connection": {
+				"timeout": {
+					"peer": {
+						"endorser": "6000",
+						"eventHub": "6000",
+						"eventReg": "6000"
+					}
+				}
+			}
+		}
+	},
+	"organizations": {
+		"mapMSP": {
+			"mspid": "mapMSP",
+			"certificateAuthorities": ["ca-map"],
+			"adminPrivateKey": {
+				"path": "/tmp/crypto/peerOrganizations/map.landrecord.com/users/Admin@map.landrecord.com/msp/keystore/a0bc34b8c854631a19f8514666db78ca6d5e8db8805217d6853e0478ceed5450_sk"
+			},
+			"peers": ["peer0.map.landrecord.com"],
+			"signedCert": {
+				"path": "/tmp/crypto/peerOrganizations/map.landrecord.com/users/Admin@map.landrecord.com/msp/signcerts/cert.pem"
+			}
+		}
+	},
+	"peers": {
+		"peer0.map.landrecord.com": {
+			"tlsCACerts": {
+				"path": "/tmp/crypto/peerOrganizations/map.landrecord.com/tlsca/tlsca.map.landrecord.com-cert.pem"
+			},
+			"url": "grpcs://peer0.map.landrecord.com:7051",
+			"eventUrl": "grpcs://peer0.map.landrecord.com:7053",
+			"grpcOptions": {
+				"ssl-target-name-override": "peer0.map.landrecord.com"
+			}
+		}
+	},
+	"certificateAuthorities": {
+		"ca-map": {
+			"url": "https://localhost:7054",
+			"httpOptions": {
+				"verify": false
+			},
+			"tlsCACerts": {
+				"path": "/peerOrganizations/map.landrecord.com/ca/ca.map.landrecord.com-cert.pem"
+			},
+
+			"caName": "ca-map"
+		}
+	}
+}
