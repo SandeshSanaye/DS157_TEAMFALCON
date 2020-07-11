@@ -15,9 +15,11 @@ Vagrant.configure('2') do |config|
     # For Peer Container
     config.vm.network "forwarded_port", guest: 7051, host: 7051
     # For Peer Container
-    config.vm.network "forwarded_port", guest: 7052, host: 7052
+    config.vm.network "forwarded_port", guest: 9051, host: 9051
     # For Peer Container
-    config.vm.network "forwarded_port", guest: 7053, host: 7053
+    config.vm.network "forwarded_port", guest: 10051, host: 10051
+    # For Peer Container
+    config.vm.network "forwarded_port", guest: 11051, host: 11051
     # For CA Container
     config.vm.network "forwarded_port", guest: 7054, host: 7054
     # For CouchDB Container
@@ -28,7 +30,7 @@ Vagrant.configure('2') do |config|
   config.vm.provider :virtualbox do |vb|
     vb.name = "hyperledger"
     vb.cpus = 2
-    vb.memory = 4096
+    vb.memory = 2024
   end
 
   config.vm.provision :shell, name: "essentials", path: "essentials.sh"
