@@ -5,3 +5,8 @@ organizations
 channel-artifacts
 system-genesis-block
 vagrant/.vagrant
+scripts/cc.env.sh
+scripts/get-cc-installed
+scripts/get-cc-info
+*.tar.gz
+chaincode/bin/*
