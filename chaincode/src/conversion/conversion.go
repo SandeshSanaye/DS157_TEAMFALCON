@@ -39,17 +39,17 @@ func (conversion *ConversionChaincode) Invoke(stub shim.ChaincodeStubInterface) 
 func SetState(stub shim.ChaincodeStubInterface) peer.Response{
 	args := stub.GetStringArgs()
 	
-	if(len(args) != 2 ){
+	if(len(args) != 3 ){
 		return shim.Error("Incorrect arguments. Expecting two arguments 'name of state' & 'state code'")
 	}
 
-	_, err := strconv.Atoi(args[1])
+	_, err := strconv.Atoi(args[2])
 	if(err !=nil){
 		return shim.Error("Incorrect data type state code should be a number!!!")
 	}
 	
-	key := strings.ToLower(args[0])
-	stub.PutState(key,[]byte(args[1]))
+	key := strings.ToLower(args[1])
+	stub.PutState(key,[]byte(args[2]))
 
 	return shim.Success([]byte("true"))
 }
@@ -58,16 +58,16 @@ func SetDistrict(stub shim.ChaincodeStubInterface) peer.Response{
 	var buffer bytes.Buffer
 	var value []byte
 	args := stub.GetStringArgs()
-	if(len(args) != 3 ){
+	if(len(args) != 4 ){
 		return shim.Error("Incorrect arguments. Expecting three arguments 'name of state' 'name of district' & 'district code'")
 	}
 
-	_, err := strconv.Atoi(args[2])
+	_, err := strconv.Atoi(args[3])
 	if(err !=nil){
 		return shim.Error("Incorrect data type district code should be a number!!!")
 	}
 
-	keys := args[0:1]
+	keys := args[1:2]
 	buffer.WriteString("")
 	for _, key := range keys{
 		key := buffer.String() + key
@@ -82,8 +82,8 @@ func SetDistrict(stub shim.ChaincodeStubInterface) peer.Response{
 		}
 	}
 
-	key := buffer.String() + strings.ToLower(args[1])
-	stub.PutState(key,[]byte(args[2]))
+	key := buffer.String() + strings.ToLower(args[2])
+	stub.PutState(key,[]byte(args[3]))
 
 	return shim.Success([]byte("true"))
 }
