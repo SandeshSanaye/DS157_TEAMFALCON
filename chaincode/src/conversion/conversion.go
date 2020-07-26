@@ -1,192 +1,97 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"github.com/hyperledger/fabric-chaincode-go/shim"
-	peer "github.com/hyperledger/fabric-protos-go/peer"
+	"reflect"
 	"strconv"
 	"strings"
-	"bytes"
+
+	"github.com/hyperledger/fabric-chaincode-go/shim"
+	peer "github.com/hyperledger/fabric-protos-go/peer"
 )
 
+// ConversionChaincode contain state, district, sub-district, village
 type ConversionChaincode struct {
-	
+	State       string `json:"state"`
+	District    string `json:"district"`
+	SubDistrict string `json:"subdistrict"`
+	Village     string `json:"village"`
 }
 
-func (conversion *ConversionChaincode) Init(stub shim.ChaincodeStubInterface) peer.Response{
-	fmt.Println("Init executed")
+// Used in erro message to find where error get from
+const processName = "Internal Conversion"
 
+// Init do nothing
+func (conversion *ConversionChaincode) Init(stub shim.ChaincodeStubInterface) peer.Response {
 	return shim.Success(nil)
 }
 
-func (conversion *ConversionChaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Response{
-	fmt.Println("##### Invoke #####")
-	funcName, _ := stub.GetFunctionAndParameters()
-	if(funcName == "state"){
-		return SetState(stub)
-	}else if(funcName == "district"){
-		return SetDistrict(stub)
-	}else if(funcName == "subdistrict"){
-		return SetSubDistrict(stub)
-	}else if(funcName == "village"){
-		return SetVillage(stub)
-	}else if(funcName == "get"){
-		return GetUid(stub)
+// Invoke call fuctions and return peer.Response
+func (conversion *ConversionChaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
+	funcName, args := stub.GetFunctionAndParameters()
+
+	if len(args) != 1 {
+		return shim.Error("!!!Error from " + processName + " Incorrect arguments. Expecting one parameter but recevied " + strconv.Itoa(len(args)))
 	}
-	return shim.Error("Fuction name '"+funcName+"' is wrong or "+funcName+" function does not exist!!!")
+
+	funcName = strings.ToLower(funcName)
+
+	// Call function
+	if funcName == "get" {
+		return GetUID(stub, args[0])
+	} else if funcName == "generate" {
+		value, err := stub.GetState("generate")
+		if err != nil {
+			return shim.Error("!!!Error from" + processName + "Unable to get data Error: " + err.Error())
+		}
+		if value == nil {
+			Generate(stub, 0, 44334)
+			stub.PutState("generate", []byte("one"))
+			return shim.Success(nil)
+		} else if string(value) == "one" {
+			Generate(stub, 44334, 88668)
+			stub.PutState("generate", []byte("done"))
+			return shim.Success(nil)
+		}
+		return shim.Error("!!!Error from" + processName + " Already data added.")
+	}
+	return shim.Error("!!!Error from " + processName + " Undefined function " + funcName)
 }
 
-func SetState(stub shim.ChaincodeStubInterface) peer.Response{
-	args := stub.GetStringArgs()
-	
-	if(len(args) != 3 ){
-		return shim.Error("Incorrect arguments. Expecting two arguments 'name of state' & 'state code'")
+// GetUID return unique code of village in India
+func GetUID(stub shim.ChaincodeStubInterface, jsonArgs string) peer.Response {
+
+	var conversionChaincode ConversionChaincode
+	err := json.Unmarshal([]byte(jsonArgs), &conversionChaincode)
+	if err != nil {
+		return shim.Error("!!!Error from " + processName + " Unable to marshal parameter. Marshal Error: " + err.Error())
 	}
 
-	_, err := strconv.Atoi(args[2])
-	if(err !=nil){
-		return shim.Error("Incorrect data type state code should be a number!!!")
-	}
-	
-	key := strings.ToLower(args[1])
-	stub.PutState(key,[]byte(args[2]))
+	args := reflect.ValueOf(conversionChaincode)
+	var key bytes.Buffer
+	key.WriteString("")
 
-	return shim.Success([]byte("true"))
-}
-
-func SetDistrict(stub shim.ChaincodeStubInterface) peer.Response{
-	var buffer bytes.Buffer
-	var value []byte
-	args := stub.GetStringArgs()
-	if(len(args) != 4 ){
-		return shim.Error("Incorrect arguments. Expecting three arguments 'name of state' 'name of district' & 'district code'")
-	}
-
-	_, err := strconv.Atoi(args[3])
-	if(err !=nil){
-		return shim.Error("Incorrect data type district code should be a number!!!")
-	}
-
-	keys := args[1:2]
-	buffer.WriteString("")
-	for _, key := range keys{
-		key := buffer.String() + key
-		if value, err = stub.GetState(key); err != nil {
-			fmt.Println("Get failed!!! ", err.Error())
-			return shim.Error(("Get failed!! "+ err.Error() + " !!!"))
+	for i := 0; i < args.NumField(); i++ {
+		value, err := stub.GetState(key.String() + strings.ToLower(args.Field(i).Interface().(string)))
+		if err != nil {
+			return shim.Error("!!!Error from " + processName + " error occured while get data!!! Error:" + err.Error())
 		}
-		if (value == nil){
-			return shim.Error(key + "not found in record!!!")
-		} else {
-			buffer.WriteString(string(value))
+		if value == nil {
+			return shim.Error("!!!Error from " + processName + " Requested " + args.Type().Field(i).Name + ": " + args.Field(i).Interface().(string) + " not found in record.")
 		}
+		key.WriteString(string(value))
 	}
 
-	key := buffer.String() + strings.ToLower(args[2])
-	stub.PutState(key,[]byte(args[3]))
-
-	return shim.Success([]byte("true"))
-}
-
-func SetSubDistrict(stub shim.ChaincodeStubInterface) peer.Response{
-	var buffer bytes.Buffer
-	var value []byte
-	args := stub.GetStringArgs()
-	if(len(args) != 4 ){
-		return shim.Error("Incorrect arguments. Expecting four 'name of state' 'name of district' 'name of sub-district' & 'sub-district code'")
-	}
-
-	_, err := strconv.Atoi(args[3])
-	if(err !=nil){
-		return shim.Error("Incorrect data type sub-district code should be a number!!!")
-	}
-
-	keys := args[0:2]
-	buffer.WriteString("")
-	for _, key := range keys{
-		key := buffer.String() + key
-		if value, err = stub.GetState(key); err != nil {
-			fmt.Println("Get failed!!! ", err.Error())
-			return shim.Error("Get failed!! "+ err.Error() + " !!!")
-		}
-		if (value == nil){
-			return shim.Error(key + "not found in record!!!")
-		} else {
-			buffer.WriteString(string(value))
-		}
-	}
-
-	key := buffer.String() + strings.ToLower(args[2])
-	stub.PutState(key,[]byte(args[3]))
-
-	return shim.Success([]byte("true"))
-}
-
-func SetVillage(stub shim.ChaincodeStubInterface) peer.Response{
-	var buffer bytes.Buffer
-	var value []byte
-	args := stub.GetStringArgs()
-	if(len(args) != 5 ){
-		return shim.Error("Incorrect arguments. Expecting five arguments 'name of state' 'name of district' 'name of sub-district' 'name of village' & 'village code'")
-	}
-
-	_, err := strconv.Atoi(args[4])
-	if(err !=nil){
-		return shim.Error("Incorrect data type village code should be a number!!!")
-	}
-
-	keys := args[0:3]
-	buffer.WriteString("")
-	for _, key := range keys{
-		key := buffer.String() + key
-		if value, err = stub.GetState(key); err != nil {
-			fmt.Println("Get failed!!! ", err.Error())
-			return shim.Error("Get failed!! "+ err.Error() + " !!!")
-		}
-		if (value == nil){
-			return shim.Error(key + "not found in record!!!")
-		} else {
-			buffer.WriteString(string(value))
-		}
-	}
-
-	key := buffer.String() + strings.ToLower(args[3])
-	stub.PutState(key,[]byte(args[4]))
-
-	return shim.Success([]byte("true"))
-}
-
-
-func GetUid(stub shim.ChaincodeStubInterface) peer.Response{
-	var value []byte
-	var err error
-	var buffer bytes.Buffer
-	key := ""
-	args := stub.GetStringArgs()
-	if(len(args) != 5 ){
-		return shim.Error("Incorrect arguments. Expecting five arguments 'name of state' 'name of district' 'name of sub-district' 'name of village' & 'survey id'")
-	}
-	for _, arg := range args{
-		key += strings.ToLower(arg)
-		if value, err = stub.GetState(key); err != nil {
-			fmt.Println("Get failed!!! ", err.Error())
-			return shim.Error("Get failed!! "+ err.Error() + " !!!")
-		}
-		if (value == nil){
-			return shim.Error(arg + "not found in record!!!")
-		} else {
-			buffer.WriteString(string(value))
-		}
-	}
-
-	return shim.Success([]byte(buffer.String()))
+	return shim.Success([]byte(key.String()))
 }
 
 func main() {
-	fmt.Println("Started Chaincode")
+	fmt.Println("####  Conversion Chaincode Started  ####")
 
 	err := shim.Start(new(ConversionChaincode))
 	if err != nil {
 		fmt.Printf("Error starting chaincode: %s", err)
-	}	
+	}
 }
