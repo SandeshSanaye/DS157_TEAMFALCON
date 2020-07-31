@@ -32,7 +32,8 @@ jobs:
         fi
       
     - name: Build
-      run: export GOPATH=${PWD}/chaincode
+      run: |
+        export GOPATH=${PWD}/chaincode
         go build -v ./...
 
     - name: Test
