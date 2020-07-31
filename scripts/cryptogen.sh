@@ -1,16 +1,7 @@
 #!/bin/bash
-#
-#SPDX-License-Identifier: Apache-2.0
-#
 
 #Add binary path
 export PATH=${PWD}/../bin:${PWD}:$PATH
-
-#Remove old crypto files if exists
-if [ -d "../organizations/peerOrganizations" ]; then
-    echo "Removing older crypto files"
-    rm -Rf ../organizations/peerOrganizations && rm -Rf ../organizations/ordererOrganizations
-fi
 
 #Check binary exits or not
 which cryptogen

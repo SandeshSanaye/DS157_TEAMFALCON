@@ -1,3 +1,13 @@
-.vagrant
 ubuntu-bionic-18.04-cloudimg-console.log
-bin
+bin/*
+scripts/log.txt
+organizations
+channel-artifacts
+system-genesis-block
+vagrant/.vagrant
+scripts/cc.env.sh
+scripts/get-cc-installed
+scripts/get-cc-info
+*.tar.gz
+chaincode/bin/*
+chaincode/pkg/*

@@ -267,7 +267,7 @@ Application: &ApplicationDefaults
             Rule: "MAJORITY Endorsement"
         Endorsement:
             Type: ImplicitMeta
-            Rule: "MAJORITY Endorsement"
+            Rule: "ANY Endorsement"
 
     Capabilities:
         <<: *ApplicationCapabilities
@@ -374,7 +374,7 @@ Channel: &ChannelDefaults
 ################################################################################
 Profiles:
 
-    LandRecordOrdererGenesis:
+    OrdererGenesis:
         <<: *ChannelDefaults
         Orderer:
             <<: *OrdererDefaults
@@ -398,6 +398,15 @@ Profiles:
                 - *map
                 - *registrar
                 - *revenue
+            Capabilities:
+                <<: *ApplicationCapabilities
+    WelfareChannel:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *registrar
                 - *welfare
             Capabilities:
                 <<: *ApplicationCapabilities

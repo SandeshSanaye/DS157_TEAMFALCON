@@ -1,0 +1,40 @@
+Vagrant.require_version ">= 1.7.4"
+Vagrant.configure('2') do |config|
+  config.vm.box = "ubuntu/bionic64"
+  config.vm.synced_folder "../", "/home/vagrant/LRBC/"
+    
+    # Ports fowards
+    # For Explorer
+    config.vm.network "forwarded_port", guest: 8080, host: 8080
+    # For REST Server
+    # config.vm.network "forwarded_port", guest: 3000, host: 3000
+    # For Docker Deamon
+    # config.vm.network "forwarded_port", guest: 2375, host: 2375
+    # For Orderer Container
+    # config.vm.network "forwarded_port", guest: 7050, host: 7050
+    # For Peer Container
+    # config.vm.network "forwarded_port", guest: 7051, host: 7051
+    # For Peer Container
+    # config.vm.network "forwarded_port", guest: 9051, host: 9051
+    # For Peer Container
+    # config.vm.network "forwarded_port", guest: 10051, host: 10051
+    # For Peer Container
+    # config.vm.network "forwarded_port", guest: 11051, host: 11051
+    # For CA Container
+    # config.vm.network "forwarded_port", guest: 7054, host: 7054
+    # For CouchDB Container
+    config.vm.network "forwarded_port", guest: 5984, host: 5984
+
+  config.ssh.forward_agent = true
+
+  config.vm.provider :virtualbox do |vb|
+    vb.name = "hyperledger"
+    vb.cpus = 2
+    vb.memory = 2024
+  end
+
+  config.vm.provision :shell, name: "essentials", path: "essentials.sh"
+  config.vm.provision :shell, name: "docker", path: "docker.sh"
+  config.vm.provision :shell, name: "golang", path: "golang.sh"
+  config.vm.provision :shell, name: "golang", path: "node.sh"
+end
