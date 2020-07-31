@@ -30,7 +30,7 @@ jobs:
             dep ensure
         fi
       env:
-        GOPATH: ./chaincode
+        GOPATH: ${PWD}/chaincode
       
     - name: Build
       run: go build -v ./...
