@@ -30,7 +30,7 @@ jobs:
             dep ensure
         fi
       env:
-        GPATH: /home/runner/work/LRBC/chaincode
+        GOPATH: /home/runner/work/LRBC/chaincode
     - name: Build
       run: go build -v .
       env:
