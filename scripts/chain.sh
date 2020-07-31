@@ -108,7 +108,8 @@ function update_properties {
     source get-cc-info &> /dev/null
 
     # Update the endorsing peers
-    CC2_ENDORSING_PEERS="--peerAddresses localhost:7051 --tlsRootCertFiles ${PWD}/../organizations/peerOrganizations/map.landrecord.com/peers/peer0.map.landrecord.com/tls/ca.crt --peerAddresses localhost:10051 --tlsRootCertFiles ${PWD}/../organizations/peerOrganizations/revenue.landrecord.com/peers/peer0.revenue.landrecord.com/tls/ca.crt --peerAddresses localhost:9051 --tlsRootCertFiles ${PWD}/../organizations/peerOrganizations/registrar.landrecord.com/peers/peer0.registrar.landrecord.com/tls/ca.crt"
+    # CC2_ENDORSING_PEERS="--peerAddresses localhost:7051 --tlsRootCertFiles ${PWD}/../organizations/peerOrganizations/map.landrecord.com/peers/peer0.map.landrecord.com/tls/ca.crt --peerAddresses localhost:10051 --tlsRootCertFiles ${PWD}/../organizations/peerOrganizations/revenue.landrecord.com/peers/peer0.revenue.landrecord.com/tls/ca.crt --peerAddresses localhost:9051 --tlsRootCertFiles ${PWD}/../organizations/peerOrganizations/registrar.landrecord.com/peers/peer0.registrar.landrecord.com/tls/ca.crt"
+    CC2_ENDORSING_PEERS="--peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE "
     
     # Update local variable for initialization
     if [ "$CC2_INIT_REQUIRED" == "true" ]; then
@@ -173,7 +174,7 @@ function cc_package {
 
 # Install
 function cc_install {
-
+    
     # If chaincode has never been installed
     if [ "$INSTALLED_MAX_LABEL_INTERNAL_VERSION" == "-1" ]; then 
         INTERNAL_DEV_VERSION=1
@@ -232,14 +233,12 @@ function cc_approveformyorg {
         # set-chain-env.sh -s $CC2_SEQUENCE_NEW
         # CC2_SEQUENCE=$CC2_SEQUENCE_NEW
     fi
-
+    
     echo "==>Approving for $ORGANIZATION_CONTEXT : [Seq#$CC2_SEQUENCE   $INIT_REQUIRED ]"
     cmd="peer lifecycle chaincode approveformyorg --channelID $CC_CHANNEL_ID  --name $CC_NAME \
          --version $CC_VERSION --package-id $INSTALLED_MAX_PACKAGE_ID --sequence $CC2_SEQUENCE \
-         $INIT_REQUIRED  $PRIVATE_DATA_JSON  -o $ORDERER_ADDRESS $SIG_POLICY $CHANNEL_CONFIG_POLICY \
-         $CC2_ENDORSING_PEERS --waitForEvent --tls --cafile ${PWD}/../organizations/ordererOrganizations/landrecord.com/orderers/orderer.landrecord.com/msp/tlscacerts/tlsca.landrecord.com-cert.pem \
-         --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE
-         "
+         $INIT_REQUIRED  $PRIVATE_DATA_JSON  -o $ORDERER_ADDRESS --ordererTLSHostnameOverride orderer.landrecord.com $SIG_POLICY $CHANNEL_CONFIG_POLICY \
+         $CC2_ENDORSING_PEERS --waitForEvent --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA"
 
     show_command_execute $cmd
 
@@ -247,10 +246,16 @@ function cc_approveformyorg {
 
 # Commit
 function cc_commit {
+    source envVar.sh
+    CC2_ENDORSING_PEERS=
+    for Org in map revenue registrar; do
+    setGlobals $Org
+    CC2_ENDORSING_PEERS="${CC2_ENDORSING_PEERS} --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE "
+    done
     echo "==>Committing for $ORGANIZATION_CONTEXT : [$CC_CHANNEL_ID $CC_NAME.$CC_VERSION  Seq#$CC2_SEQUENCE   $INIT_REQUIRED on $CC2_ENDORSING_PEERS]"
-    cmd="peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer.landrecord.com \
+    cmd="peer lifecycle chaincode commit -o $ORDERER_ADDRESS --ordererTLSHostnameOverride orderer.landrecord.com \
         -C $CC_CHANNEL_ID -n $CC_NAME -v $CC_VERSION \
-        --sequence $CC2_SEQUENCE --tls --cafile ${PWD}/../organizations/ordererOrganizations/landrecord.com/orderers/orderer.landrecord.com/msp/tlscacerts/tlsca.landrecord.com-cert.pem  \
+        --sequence $CC2_SEQUENCE --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA  \
         $SIG_POLICY $CHANNEL_CONFIG_POLICY $CC2_ENDORSING_PEERS \
         $INIT_REQUIRED $PRIVATE_DATA_JSON --waitForEvent"
 
@@ -259,11 +264,16 @@ function cc_commit {
 
 # Init
 function cc_init {
-    # invoke with --isInit
+    source envVar.sh
+    CC2_ENDORSING_PEERS=
+    for Org in map revenue registrar; do
+    setGlobals $Org
+    CC2_ENDORSING_PEERS="${CC2_ENDORSING_PEERS} --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE "
+    done
     echo "==>Initializing  -C $CC_CHANNEL_ID -n $CC_NAME"
     cmd="peer chaincode invoke  -C $CC_CHANNEL_ID -n $CC_NAME -c '$CC_CONSTRUCTOR' \
     --waitForEvent $IS_INIT -o $ORDERER_ADDRESS --ordererTLSHostnameOverride orderer.landrecord.com \
-    $CC2_ENDORSING_PEERS  --tls --cafile ${PWD}/../organizations/ordererOrganizations/landrecord.com/orderers/orderer.landrecord.com/msp/tlscacerts/tlsca.landrecord.com-cert.pem"
+    $CC2_ENDORSING_PEERS  --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA"
 
     show_command_execute $cmd
 }
@@ -271,8 +281,8 @@ function cc_init {
 function cc_invoke {
     # invoke
     cmd="peer chaincode invoke -C $CC_CHANNEL_ID -n $CC_NAME  -c '$CC_INVOKE_ARGS' -o $ORDERER_ADDRESS \
-     --waitForEvent \
-     $CC2_ENDORSING_PEERS --tls --cafile ${PWD}/../organizations/ordererOrganizations/landrecord.com/orderers/orderer.landrecord.com/msp/tlscacerts/tlsca.landrecord.com-cert.pem"
+     --ordererTLSHostnameOverride orderer.landrecord.com --waitForEvent \
+     $CC2_ENDORSING_PEERS --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA"
 
      show_command_execute $cmd
 }
@@ -337,7 +347,7 @@ function cc_upgrade_auto {
     
     # 2. Check the latest committed sequence
     get-cc-info.sh  &> /dev/null
-    source $CC2_ENV_FOLDER/get-cc-info &> /dev/null
+    source get-cc-info &> /dev/null
 
     # 3. Increment the sequence number
     if [ "$COMMITTED_CC_SEQUENCE" == "-1" ]; then

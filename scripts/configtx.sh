@@ -20,7 +20,7 @@ echo -e "##########################################################\e[39m"
 # Note: For some unknown reason (at least for now) the block file can't be
 # named orderer.genesis.block or the orderer will fail to launch!
 set -x
-configtxgen -profile LandRecordOrdererGenesis -channelID landrecord -outputBlock ../system-genesis-block/genesis.block
+configtxgen -profile OrdererGenesis -channelID landrecord -outputBlock ../system-genesis-block/genesis.block
 res=$?
 set +x
 if [ $res -ne 0 ]; then

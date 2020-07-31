@@ -12,7 +12,8 @@ export PEER0_map_CA=${PWD}/../organizations/peerOrganizations/map.landrecord.com
 export PEER0_registrar_CA=${PWD}/../organizations/peerOrganizations/registrar.landrecord.com/peers/peer0.registrar.landrecord.com/tls/ca.crt
 export PEER0_revenue_CA=${PWD}/../organizations/peerOrganizations/revenue.landrecord.com/peers/peer0.revenue.landrecord.com/tls/ca.crt
 export PEER0_welfare_CA=${PWD}/../organizations/peerOrganizations/welfare.com/peers/peer0.welfare.com/tls/ca.crt
-
+export FABRIC_CFG_PATH="../config/configtx"
+export ORDERER_ADDRESS=localhost:7050
 
 # Set OrdererOrg.Admin globals
 setOrdererGlobals() {
@@ -23,31 +24,26 @@ setOrdererGlobals() {
 
 # Set environment variables for the peer org
 setGlobals() {
-  local USING_ORG=""
-  if [ -z "$OVERRIDE_ORG" ]; then
-    USING_ORG=$1
-  else
-    USING_ORG="${OVERRIDE_ORG}"
-  fi
+  export USING_ORG=$1
   echo "Using organization ${USING_ORG}"
-  if [ $USING_ORG -eq 1 ]; then
+  if [ $USING_ORG == "map" ]; then
     export CORE_PEER_LOCALMSPID="mapMSP"
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_map_CA
     export CORE_PEER_MSPCONFIGPATH=${PWD}/../organizations/peerOrganizations/map.landrecord.com/users/Admin@map.landrecord.com/msp
     export CORE_PEER_ADDRESS=localhost:7051
-  elif [ $USING_ORG -eq 2 ]; then
+  elif [ $USING_ORG == "registrar" ]; then
     export CORE_PEER_LOCALMSPID="registrarMSP"
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_registrar_CA
     export CORE_PEER_MSPCONFIGPATH=${PWD}/../organizations/peerOrganizations/registrar.landrecord.com/users/Admin@registrar.landrecord.com/msp
     export CORE_PEER_ADDRESS=localhost:9051
 
-  elif [ $USING_ORG -eq 3 ]; then
+  elif [ $USING_ORG == "revenue" ]; then
     export CORE_PEER_LOCALMSPID="revenueMSP"
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_revenue_CA
     export CORE_PEER_MSPCONFIGPATH=${PWD}/../organizations/peerOrganizations/revenue.landrecord.com/users/Admin@revenue.landrecord.com/msp
     export CORE_PEER_ADDRESS=localhost:10051
 
-  elif [ $USING_ORG -eq 4 ]; then
+  elif [ $USING_ORG == "welfare" ]; then
     export CORE_PEER_LOCALMSPID="welfareMSP"
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_welfare_CA
     export CORE_PEER_MSPCONFIGPATH=${PWD}/../organizations/peerOrganizations/welfare.com/users/Admin@welfare.com/msp
@@ -55,7 +51,6 @@ setGlobals() {
   
   else
     echo "================== ERROR !!! ORG Unknown =================="
-    exit 1
   fi
 
   if [ "$VERBOSE" == "true" ]; then
@@ -90,6 +85,5 @@ verifyResult() {
   if [ $1 -ne 0 ]; then
     echo "!!!!!!!!!!!!!!! "$2" !!!!!!!!!!!!!!!!"
     echo
-    exit 1
   fi
 }
