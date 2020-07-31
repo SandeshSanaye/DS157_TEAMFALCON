@@ -23,8 +23,7 @@ jobs:
       uses: actions/checkout@v2
   
     - name: Get dependencies
-      run: |
-        export GOPATH=${PWD}/chaincode 
+      run: | 
         go get -v -t -d github.com/hyperledger/fabric-chaincode-go/shim
         go get -v -t -d github.com/hyperledger/fabric-protos-go/peer
         if [ -f Gopkg.toml ]; then
