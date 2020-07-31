@@ -11,3 +11,6 @@ scripts/get-cc-info
 *.tar.gz
 chaincode/bin/*
 chaincode/pkg/*
+chaincode/src/github.com
+chaincode/src/golang.org
+chaincode/src/google.golang.org
