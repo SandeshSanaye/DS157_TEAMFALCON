@@ -25,7 +25,8 @@ jobs:
     - name: Get dependencies
       run: |
         export GOPATH=${PWD}/chaincode 
-        go get -v -t -d ./...
+        go get -v -t -d github.com/hyperledger/fabric-chaincode-go/shim
+        go get -v -t -d github.com/hyperledger/fabric-protos-go/peer
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
