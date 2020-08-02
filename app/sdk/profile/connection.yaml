@@ -1,0 +1,40 @@
+---
+name: test-network-registrar
+version: 1.0.0
+client:
+  organization: registrar
+  connection:
+    timeout:
+      peer:
+        endorser: '300'
+organizations:
+  registrar:
+    mspid: registrarMSP
+    peers:
+    - peer0.registrar.landrecord.com
+    certificateAuthorities:
+    - ca.registrar.landrecord.com
+peers:
+  peer0.registrar.landrecord.com:
+    url: grpcs://localhost:9051
+    tlsCACerts:
+      pem: |
+        -----BEGIN CERTIFICATE-----
+        MIICQjCCAemgAwIBAgIUQK3afoJpdLliVGkIVYF8m4dBeJwwCgYIKoZIzj0EAwIw
+        fjEMMAoGA1UEBhMDSU5EMRQwEgYDVQQIEwtNYWhhcmFzaHRyYTEPMA0GA1UEBxMG
+        TXVtYmFpMSEwHwYDVQQKExhyZWdpc3RyYXIubGFuZHJlY29yZC5jb20xJDAiBgNV
+        BAMTG2NhLnJlZ2lzdHJhci5sYW5kcmVjb3JkLmNvbTAeFw0yMDA3MjUxMDA5MDBa
+        Fw0zNTA3MjIxMDA5MDBaMH4xDDAKBgNVBAYTA0lORDEUMBIGA1UECBMLTWFoYXJh
+        c2h0cmExDzANBgNVBAcTBk11bWJhaTEhMB8GA1UEChMYcmVnaXN0cmFyLmxhbmRy
+        ZWNvcmQuY29tMSQwIgYDVQQDExtjYS5yZWdpc3RyYXIubGFuZHJlY29yZC5jb20w
+        WTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARk6/S8Z7AxKhs9D7YDRM5f0VC4A3xB
+        6nRxj69f2lZX3unimvBYNijlNX7QYqdGARzHuOkuwHcOeQsQbsITbaM1o0UwQzAO
+        BgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4EFgQUEgJ1
+        J0DEE0qxnTpwoYEfhub1VtwwCgYIKoZIzj0EAwIDRwAwRAIgDO48KQM3ZQ4J73EI
+        LMeg/i9D6KAcyk/xOjFQcQS6KdICIFcLA/7S0W5I7kR1varts1jLo/APG8JfJasb
+        KGnXo3yO
+        -----END CERTIFICATE-----
+        
+    grpcOptions:
+      ssl-target-name-override: peer0.registrar.landrecord.com
+      hostnameOverride: peer0.registrar.landrecord.com
